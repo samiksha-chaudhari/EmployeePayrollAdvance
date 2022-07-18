@@ -40,5 +40,70 @@ namespace Employee_Payroll_Ad.Controller
                 return this.NotFound(new ResponseModel<string>() { Status = false, Message = ex.Message });
             }
         }
+
+        [HttpGet]
+        [Route("api/GetAllEmployee")]
+        public IActionResult GetAllEmployee()
+        {
+            var result = this.manager.GetAllEmployee();
+            try
+            {
+                if (result.Count > 0)
+                {
+                    return this.Ok(new { Status = true, Message = "All Notes", data = result });
+                }
+                else
+                {
+                    return this.BadRequest(new ResponseModel<string>() { Status = false, Message = "Try again" });
+                }
+            }
+            catch (Exception e)
+            {
+                return this.NotFound(new ResponseModel<string>() { Status = false, Message = e.Message });
+            }
+        }
+
+        [HttpGet]
+        [Route("api/GetEmployee")]
+        public IActionResult GetEmployee(int employeeId)
+        {
+            var result = this.manager.GetEmployee(employeeId);
+            try
+            {
+                if (result != null)
+                {
+                    return this.Ok(new { Status = true, Message = "Book is retrived", data = result });
+                }
+                else
+                {
+                    return this.BadRequest(new ResponseModel<string>() { Status = false, Message = "Try again" });
+                }
+            }
+            catch (Exception e)
+            {
+                return this.NotFound(new ResponseModel<string>() { Status = false, Message = e.Message });
+            }
+        }
+        [HttpPut]
+        [Route("api/UpdateEmployeeDetails")]
+        public IActionResult UpdateEmployeeDetails(EmployeeModel employeemodel)
+        {
+            try
+            {
+                var result = this.manager.UpdateEmployeeDetails(employeemodel);
+                if (result)
+                {
+                    return this.Ok(new ResponseModel<string>() { Status = true, Message = "Book updated Successfully !" });
+                }
+                else
+                {
+                    return this.BadRequest(new ResponseModel<string>() { Status = false, Message = "Failed to updated Book" });
+                }
+            }
+            catch (Exception ex)
+            {
+                return this.NotFound(new ResponseModel<string>() { Status = false, Message = ex.Message });
+            }
+        }
     }
 }

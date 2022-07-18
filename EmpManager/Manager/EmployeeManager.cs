@@ -26,5 +26,40 @@ namespace EmpManager.Manager
                 throw new Exception(ex.Message);
             }
         }
+
+        public List<EmployeeModel> GetAllEmployee()
+        {
+            try
+            {
+                return this.repository.GetAllEmployee();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        public EmployeeModel GetEmployee(int employeeId)
+        {
+            try
+            {
+                return this.repository.GetEmployee(employeeId);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+        public bool UpdateEmployeeDetails(EmployeeModel employeemodel)
+        {
+            try
+            {
+                return this.repository.UpdateEmployeeDetails(employeemodel);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
     }
 }
