@@ -45,3 +45,24 @@ TAX float
 
 alter table [Salary] add constraint Payout_SalaryId_FK
 foreign key (SalaryId) references [Salary](SalaryId)
+
+--SP to store employee details
+create procedure sp_EmpRegister
+(  
+	@UserName varchar(50),
+	@Email varchar(50),
+	@Password varchar(50),
+	@MobileNo varchar(12),
+	@ProfileImage varchar(50),
+	@Gender varchar(4),
+	@Department varchar(50),
+	@startDate date,
+	@Note varchar(50)
+)   
+as 
+begin    
+    Insert into Employee (UserName,Email,Password,MobileNo,ProfileImage,Gender,Department,startDate,Note)    
+	Values (@UserName,@Email, @Password,@MobileNo,@ProfileImage,@Gender,@Department,@startDate,@Note)    
+end
+
+select * from Employee

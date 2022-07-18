@@ -4,7 +4,7 @@ using System.Text;
 
 namespace EmpModel
 {
-    class PayoutModel
+    public class PayoutModel
     {      
         public int PayoutId { get; set; }
         public int SalaryId { get; set; }  

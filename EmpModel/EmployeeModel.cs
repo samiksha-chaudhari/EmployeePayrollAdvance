@@ -4,7 +4,7 @@ using System.Text;
 
 namespace EmpModel
 {
-    class EmployeeModel
+    public class EmployeeModel
     {
         public int EmployeeId { get; set; }
         public string UserName { get; set; }

@@ -6,7 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Interface\" />
+    <ProjectReference Include="..\EmpRepository\EmpRepository.csproj" />
   </ItemGroup>
 
 </Project>

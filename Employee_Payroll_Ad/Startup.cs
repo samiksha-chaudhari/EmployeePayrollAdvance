@@ -12,6 +12,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.OpenApi.Models;
+using EmpRepository.Interface;
+using EmpRepository.Repository;
+using EmpManager.Interface;
+using EmpManager.Manager;
 
 namespace Employee_Payroll_Ad
 {
@@ -26,8 +30,10 @@ namespace Employee_Payroll_Ad
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddMvc();
-            
+            services.AddMvc();            
+            services.AddTransient<IEmployeeRepository, EmployeeRepository>();
+            services.AddTransient<IEmployeeManager, EmployeeManager>();
+
             services.AddSession();
             services.AddCors(options => options.AddPolicy("AllowAllHeaders", builder =>
             {
