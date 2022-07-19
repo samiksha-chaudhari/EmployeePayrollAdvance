@@ -8,8 +8,10 @@ namespace EmpRepository.Interface
         bool Register(EmployeeModel EmployeeData);
         List<EmployeeModel> GetAllEmployee();
         EmployeeModel GetEmployee(int employeeId);
+        EmployeeModel GetEmployeeByEmail(string Email);
         bool UpdateEmployeeDetails(EmployeeModel employeemodel);
         string Login(LoginModel login);
+        string GenerateToken(string userName);
 
     }
 }

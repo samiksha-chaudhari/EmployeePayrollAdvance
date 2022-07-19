@@ -84,6 +84,14 @@ BEGIN
 	WHERE EmployeeId = @EmployeeId
 END
 
+--SP to get specific employee detail
+CREATE PROC spGetSpecificEmpDetailByEmail
+	@Email varchar(50)
+AS
+BEGIN 
+	SELECT * FROM [Employee]
+	WHERE Email = @Email
+END
 --SP to update employee details
 CREATE PROC spUpdateEmployeeDetails
     @EmployeeId int,
@@ -132,6 +140,30 @@ BEGIN
 	IF EXISTS(SELECT * FROM Employee WHERE Email=@Email)
 	BEGIN 
 		IF EXISTS(SELECT * FROM Employee WHERE Email=@Email AND Password=@Password AND EmployeeId=@EmployeeId)
+		BEGIN
+			SET @user = 2;
+		END
+		ELSE
+		BEGIN
+			SET @user = 1;
+		END
+	END
+	ELSE
+	BEGIN
+		SET @user = NULL;
+	END
+END
+
+--2nd SP for employee login
+CREATE PROC spEmployeeLogin
+	@Email VARCHAR(50),
+	@Password VARCHAR(50),
+	@user INT = NULL OUTPUT
+AS
+BEGIN
+	IF EXISTS(SELECT * FROM Employee WHERE Email=@Email)
+	BEGIN 
+		IF EXISTS(SELECT * FROM Employee WHERE Email=@Email AND Password=@Password)
 		BEGIN
 			SET @user = 2;
 		END

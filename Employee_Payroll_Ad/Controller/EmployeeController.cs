@@ -52,7 +52,16 @@ namespace Employee_Payroll_Ad.Controller
                 string result = this.manager.Login(login);
                 if (result.Equals("Login is Successfull"))
                 {
-                    return this.Ok(new ResponseModel<string>() { Status = true, Message = result });
+                    ConnectionMultiplexer connectionMultiplexer = ConnectionMultiplexer.Connect("127.0.0.1:6379");
+                    IDatabase database = connectionMultiplexer.GetDatabase();
+
+                    Dictionary<string, string> data = new Dictionary<string, string>();
+                    data.Add("EmployeeId", database.StringGet("EmployeeId"));
+                    data.Add("UserName", database.StringGet("UserName"));
+                    data.Add("MobileNo", database.StringGet("MobileNo"));
+                    data.Add("Email", login.Email);
+                    data.Add("accessToken", this.manager.GenerateToken(login.Email));
+                    return this.Ok(new { Status = true, Message = result, result = data });
                 }
                 else if (result.Equals("Invalid Password"))
                 {
@@ -98,6 +107,28 @@ namespace Employee_Payroll_Ad.Controller
         public IActionResult GetEmployee(int employeeId)
         {
             var result = this.manager.GetEmployee(employeeId);
+            try
+            {
+                if (result != null)
+                {
+                    return this.Ok(new { Status = true, Message = "Book is retrived", data = result });
+                }
+                else
+                {
+                    return this.BadRequest(new ResponseModel<string>() { Status = false, Message = "Try again" });
+                }
+            }
+            catch (Exception e)
+            {
+                return this.NotFound(new ResponseModel<string>() { Status = false, Message = e.Message });
+            }
+        }
+
+        [HttpGet]
+        [Route("api/GetEmployeeByEmail")]
+        public IActionResult GetEmployeeByEmail(string Email)
+        {
+            var result = this.manager.GetEmployeeByEmail(Email);
             try
             {
                 if (result != null)

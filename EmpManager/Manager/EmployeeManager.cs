@@ -62,11 +62,33 @@ namespace EmpManager.Manager
                 throw new Exception(ex.Message);
             }
         }
+        public EmployeeModel GetEmployeeByEmail(string Email)
+        {
+            try
+            {
+                return this.repository.GetEmployeeByEmail(Email);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
         public bool UpdateEmployeeDetails(EmployeeModel employeemodel)
         {
             try
             {
                 return this.repository.UpdateEmployeeDetails(employeemodel);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+        public string GenerateToken(string userName)
+        {
+            try
+            {
+                return this.repository.GenerateToken(userName);
             }
             catch (Exception ex)
             {

@@ -61,31 +61,69 @@ namespace EmpRepository.Repository
             }
         }
 
+        //public string Login(LoginModel login)
+        //{
+        //    sqlConnection = new SqlConnection(this.Configuration.GetConnectionString("EmployeeDB"));
+
+        //    try
+        //    {
+        //        using (sqlConnection)
+        //        {
+        //            SqlCommand sqlCommand = new SqlCommand("spUserLogin", sqlConnection);
+        //            // login.Password = EncryptPassword(login.Password);
+        //            sqlCommand.CommandType = System.Data.CommandType.StoredProcedure;
+        //            sqlConnection.Open();
+
+        //            sqlCommand.Parameters.AddWithValue("@Email", login.Email);
+        //            sqlCommand.Parameters.AddWithValue("@Password", login.Password);
+        //            sqlCommand.Parameters.AddWithValue("@EmployeeId", login.EmployeeId);
+        //            sqlCommand.Parameters.Add("@user", SqlDbType.Int).Direction = ParameterDirection.Output;
+
+        //            sqlCommand.ExecuteNonQuery();
+        //            var result = sqlCommand.Parameters["@user"].Value;
+        //            if (!(result is DBNull))
+        //            {
+        //                if (Convert.ToInt32(result) == 2)
+        //                {
+        //                    GetEmployee(login.EmployeeId);
+        //                    return "Login is Successfull";
+        //                }
+        //                return "Incorrect email or password";
+        //            }
+        //            return "Login failed";
+        //        }
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        throw new Exception(e.Message);
+        //    }
+        //    finally
+        //    {
+        //        sqlConnection.Close();
+        //    }
+        //}
+
         public string Login(LoginModel login)
         {
             sqlConnection = new SqlConnection(this.Configuration.GetConnectionString("EmployeeDB"));
-
             try
             {
                 using (sqlConnection)
                 {
-                    SqlCommand sqlCommand = new SqlCommand("spUserLogin", sqlConnection);
+                    SqlCommand sqlCommand = new SqlCommand("spEmployeeLogin", sqlConnection);
                     // login.Password = EncryptPassword(login.Password);
                     sqlCommand.CommandType = System.Data.CommandType.StoredProcedure;
                     sqlConnection.Open();
-
                     sqlCommand.Parameters.AddWithValue("@Email", login.Email);
                     sqlCommand.Parameters.AddWithValue("@Password", login.Password);
-                    sqlCommand.Parameters.AddWithValue("@EmployeeId", login.EmployeeId);
                     sqlCommand.Parameters.Add("@user", SqlDbType.Int).Direction = ParameterDirection.Output;
-
                     sqlCommand.ExecuteNonQuery();
                     var result = sqlCommand.Parameters["@user"].Value;
                     if (!(result is DBNull))
                     {
                         if (Convert.ToInt32(result) == 2)
                         {
-                            GetEmployee(login.EmployeeId);
+                            GetEmployeeByEmail(login.Email);
                             return "Login is Successfull";
                         }
                         return "Incorrect email or password";
@@ -101,6 +139,15 @@ namespace EmpRepository.Repository
             {
                 sqlConnection.Close();
             }
+        }
+
+        public string EncryptPassword(string password)
+        {
+            string strmsg = string.Empty;
+            byte[] encode = new byte[password.Length];
+            encode = Encoding.UTF8.GetBytes(password);
+            strmsg = Convert.ToBase64String(encode);
+            return strmsg;
         }
 
         public List<EmployeeModel> GetAllEmployee()
@@ -186,6 +233,43 @@ namespace EmpRepository.Repository
                 }
         }
 
+        public EmployeeModel GetEmployeeByEmail(string Email)
+        {
+            sqlConnection = new SqlConnection(this.Configuration.GetConnectionString("EmployeeDB"));
+            using (sqlConnection)
+                try
+                {
+                    SqlCommand sqlCommand = new SqlCommand("spGetSpecificEmpDetailByEmail", sqlConnection);
+                    sqlCommand.CommandType = System.Data.CommandType.StoredProcedure;
+                    sqlConnection.Open();
+                    sqlCommand.Parameters.AddWithValue("@Email", Email);
+                    EmployeeModel emp = new EmployeeModel();
+                    SqlDataReader read = sqlCommand.ExecuteReader();
+                    if (read.Read())
+                    {
+                        emp.EmployeeId = Convert.ToInt32(read["EmployeeId"]);
+                        emp.UserName = read["UserName"].ToString();
+                        emp.Email = read["Email"].ToString();
+                        emp.Password = read["Password"].ToString();
+                        emp.MobileNo = read["MobileNo"].ToString();
+                        emp.ProfileImage = read["ProfileImage"].ToString();
+                        emp.Gender = read["Gender"].ToString();
+                        emp.Department = read["Department"].ToString();
+                        emp.StartDate = Convert.ToDateTime(read["StartDate"]);
+                        emp.Note = read["Note"].ToString();
+                    }
+                    return emp;
+                }
+                catch (Exception e)
+                {
+                    throw new Exception(e.Message);
+                }
+                finally
+                {
+                    sqlConnection.Close();
+                }
+        }
+
         public bool UpdateEmployeeDetails(EmployeeModel employeemodel)
         {
             sqlConnection = new SqlConnection(this.Configuration.GetConnectionString("EmployeeDB"));
@@ -224,6 +308,28 @@ namespace EmpRepository.Repository
                 {
                     sqlConnection.Close();
                 }
+        }
+
+        public string GenerateToken(string userName)
+        {
+            try
+            {
+                var key = Encoding.UTF8.GetBytes(this.Configuration["SecretKey"]);
+                SymmetricSecurityKey securityKey = new SymmetricSecurityKey(key);
+                SecurityTokenDescriptor descriptor = new SecurityTokenDescriptor
+                {
+                    Subject = new ClaimsIdentity(new[] { new Claim(ClaimTypes.Name, userName) }),
+                    Expires = DateTime.UtcNow.AddMinutes(3000000),
+                    SigningCredentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256Signature)
+                };
+                JwtSecurityTokenHandler handler = new JwtSecurityTokenHandler();
+                JwtSecurityToken token = handler.CreateJwtSecurityToken(descriptor);
+                return handler.WriteToken(token);
+            }
+            catch (ArgumentNullException ex)
+            {
+                throw new ArgumentNullException(ex.Message);
+            }
         }
 
     }
