@@ -35,6 +35,8 @@ namespace Employee_Payroll_Ad
             services.AddTransient<IEmployeeManager, EmployeeManager>();
             services.AddTransient<IAddressRepository, AddressRepository>();
             services.AddTransient<IAddressManager, AddressManager>();
+            services.AddTransient<ISalaryRepository, SalaryRepository>();
+            services.AddTransient<ISalaryManager, SalaryManager>();
 
             services.AddSession();
             services.AddCors(options => options.AddPolicy("AllowAllHeaders", builder =>

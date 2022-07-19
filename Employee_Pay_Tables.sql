@@ -17,8 +17,8 @@ Note varchar(50) NOT NULL
 create table Salary(
 SalaryId int identity(1,1) primary key,
 EmployeeId int not null,
-SalaryDate date,
 Amount float,
+SalaryDate date,
 PaySlip date
 );
 
@@ -220,6 +220,58 @@ BEGIN
 			Address = CASE WHEN @Address='' THEN Address ELSE @Address END,
 			City = CASE WHEN @City='' THEN City ELSE @City END, 
 			State= CASE WHEN @State='' THEN State ELSE @State END
+			WHERE
+			EmployeeId = @EmployeeId;
+	END
+	ELSE
+	BEGIN
+		SET @count =NULL;
+	END
+END
+
+--*****************************************************************************************
+--SP to store employee Salary details
+create procedure sp_AddEmpSalary
+(  
+	@EmployeeId int,
+	@SalaryDate datetime,
+	@Amount float,
+	@PaySlip datetime
+)   
+as 
+begin    
+    Insert into Salary(EmployeeId,SalaryDate,Amount,PaySlip)    
+	Values (@EmployeeId,@SalaryDate, @Amount,@PaySlip)    
+end
+
+select * from Salary
+
+--SP to get specific employee  Salary
+CREATE PROC spGetSpecificEmpSalaryDetail
+	@EmployeeId int
+AS
+BEGIN 
+	SELECT * FROM [Salary]
+	WHERE EmployeeId = @EmployeeId
+END
+
+--SP to update employee Salary details
+CREATE PROC spUpdateEmployeeSalary
+    @EmployeeId int,
+	@SalaryDate datetime,
+	@Amount float,
+	@PaySlip datetime,
+	@count INT = NULL OUTPUT
+AS
+BEGIN
+	IF EXISTS(SELECT * FROM [Address] WHERE EmployeeId = @EmployeeId )
+	BEGIN
+		SET @count = @EmployeeId
+		UPDATE [Salary]
+		SET
+			SalaryDate = CASE WHEN @SalaryDate='' THEN SalaryDate ELSE @SalaryDate END,
+			Amount = CASE WHEN @Amount='' THEN Amount ELSE @Amount END, 
+			PaySlip= CASE WHEN @PaySlip='' THEN PaySlip ELSE @PaySlip END
 			WHERE
 			EmployeeId = @EmployeeId;
 	END
