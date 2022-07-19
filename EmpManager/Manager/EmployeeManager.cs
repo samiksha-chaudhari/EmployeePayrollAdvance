@@ -26,6 +26,18 @@ namespace EmpManager.Manager
                 throw new Exception(ex.Message);
             }
         }
+        public string Login(LoginModel login)
+        {
+            try
+            {
+                return this.repository.Login(login);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
 
         public List<EmployeeModel> GetAllEmployee()
         {

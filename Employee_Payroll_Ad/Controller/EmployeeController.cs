@@ -2,6 +2,7 @@
 using EmpModel;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using StackExchange.Redis;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -37,6 +38,35 @@ namespace Employee_Payroll_Ad.Controller
             }
             catch (Exception ex)
             {
+                return this.NotFound(new ResponseModel<string>() { Status = false, Message = ex.Message });
+            }
+        }
+
+        [HttpPost]
+        [Route("api/login")]
+        public IActionResult Login([FromBody] LoginModel login)
+        {
+            try
+            {
+
+                string result = this.manager.Login(login);
+                if (result.Equals("Login is Successfull"))
+                {
+                    return this.Ok(new ResponseModel<string>() { Status = true, Message = result });
+                }
+                else if (result.Equals("Invalid Password"))
+                {
+                    return this.BadRequest(new ResponseModel<string>() { Status = false, Message = result });
+                }
+                else
+                {
+
+                    return this.BadRequest(new ResponseModel<string>() { Status = false, Message = result });
+                }
+            }
+            catch (Exception ex)
+            {
+
                 return this.NotFound(new ResponseModel<string>() { Status = false, Message = ex.Message });
             }
         }

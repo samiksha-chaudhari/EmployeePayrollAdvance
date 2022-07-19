@@ -121,3 +121,27 @@ BEGIN
 		SET @count =NULL;
 	END
 END
+--SP for employee login
+CREATE PROC spUserLogin
+    @EmployeeId int,
+	@Email VARCHAR(50),
+	@Password VARCHAR(50),
+	@user INT = NULL OUTPUT
+AS
+BEGIN
+	IF EXISTS(SELECT * FROM Employee WHERE Email=@Email)
+	BEGIN 
+		IF EXISTS(SELECT * FROM Employee WHERE Email=@Email AND Password=@Password AND EmployeeId=@EmployeeId)
+		BEGIN
+			SET @user = 2;
+		END
+		ELSE
+		BEGIN
+			SET @user = 1;
+		END
+	END
+	ELSE
+	BEGIN
+		SET @user = NULL;
+	END
+END

@@ -9,5 +9,6 @@ namespace EmpManager.Interface
         List<EmployeeModel> GetAllEmployee();
         EmployeeModel GetEmployee(int employeeId);
         bool UpdateEmployeeDetails(EmployeeModel employeemodel);
+        string Login(LoginModel login);
     }
 }

@@ -61,6 +61,48 @@ namespace EmpRepository.Repository
             }
         }
 
+        public string Login(LoginModel login)
+        {
+            sqlConnection = new SqlConnection(this.Configuration.GetConnectionString("EmployeeDB"));
+
+            try
+            {
+                using (sqlConnection)
+                {
+                    SqlCommand sqlCommand = new SqlCommand("spUserLogin", sqlConnection);
+                    // login.Password = EncryptPassword(login.Password);
+                    sqlCommand.CommandType = System.Data.CommandType.StoredProcedure;
+                    sqlConnection.Open();
+
+                    sqlCommand.Parameters.AddWithValue("@Email", login.Email);
+                    sqlCommand.Parameters.AddWithValue("@Password", login.Password);
+                    sqlCommand.Parameters.AddWithValue("@EmployeeId", login.EmployeeId);
+                    sqlCommand.Parameters.Add("@user", SqlDbType.Int).Direction = ParameterDirection.Output;
+
+                    sqlCommand.ExecuteNonQuery();
+                    var result = sqlCommand.Parameters["@user"].Value;
+                    if (!(result is DBNull))
+                    {
+                        if (Convert.ToInt32(result) == 2)
+                        {
+                            GetEmployee(login.EmployeeId);
+                            return "Login is Successfull";
+                        }
+                        return "Incorrect email or password";
+                    }
+                    return "Login failed";
+                }
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
+            }
+            finally
+            {
+                sqlConnection.Close();
+            }
+        }
+
         public List<EmployeeModel> GetAllEmployee()
         {
             sqlConnection = new SqlConnection(this.Configuration.GetConnectionString("EmployeeDB"));
