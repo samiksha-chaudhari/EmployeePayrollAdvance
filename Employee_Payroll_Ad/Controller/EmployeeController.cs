@@ -29,11 +29,11 @@ namespace Employee_Payroll_Ad.Controller
                 var result = this.manager.Register(EmployeeData);
                 if (result)
                 {
-                    return this.Ok(new ResponseModel<string>() { Status = true, Message = "Added New User Successfully !" });
+                    return this.Ok(new ResponseModel<string>() { Status = true, Message = "Added New Employee Successfully !" });
                 }
                 else
                 {
-                    return this.BadRequest(new ResponseModel<string>() { Status = false, Message = "Failed to add new user, Try again" });
+                    return this.BadRequest(new ResponseModel<string>() { Status = false, Message = "Failed to add new Employee, Try again" });
                 }
             }
             catch (Exception ex)
@@ -89,7 +89,7 @@ namespace Employee_Payroll_Ad.Controller
             {
                 if (result.Count > 0)
                 {
-                    return this.Ok(new { Status = true, Message = "All Notes", data = result });
+                    return this.Ok(new { Status = true, Message = "All Employeee Details", data = result });
                 }
                 else
                 {
@@ -111,7 +111,7 @@ namespace Employee_Payroll_Ad.Controller
             {
                 if (result != null)
                 {
-                    return this.Ok(new { Status = true, Message = "Book is retrived", data = result });
+                    return this.Ok(new { Status = true, Message = "Employee details retrived", data = result });
                 }
                 else
                 {
@@ -133,7 +133,7 @@ namespace Employee_Payroll_Ad.Controller
             {
                 if (result != null)
                 {
-                    return this.Ok(new { Status = true, Message = "Book is retrived", data = result });
+                    return this.Ok(new { Status = true, Message = "Employee details retrived", data = result });
                 }
                 else
                 {
@@ -154,11 +154,11 @@ namespace Employee_Payroll_Ad.Controller
                 var result = this.manager.UpdateEmployeeDetails(employeemodel);
                 if (result)
                 {
-                    return this.Ok(new ResponseModel<string>() { Status = true, Message = "Book updated Successfully !" });
+                    return this.Ok(new ResponseModel<string>() { Status = true, Message = "Employee Details updated Successfully !" });
                 }
                 else
                 {
-                    return this.BadRequest(new ResponseModel<string>() { Status = false, Message = "Failed to updated Book" });
+                    return this.BadRequest(new ResponseModel<string>() { Status = false, Message = "Failed to updated Details" });
                 }
             }
             catch (Exception ex)

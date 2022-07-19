@@ -26,5 +26,27 @@ namespace EmpManager.Manager
                 throw new Exception(ex.Message);
             }
         }
+        public AddressModel GetEmployeeAddress(int employeeId)
+        {
+            try
+            {
+                return this.repository.GetEmployeeAddress(employeeId);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+        public bool UpdateEmployeeAddress(AddressModel address)
+        {
+            try
+            {
+                return this.repository.UpdateEmployeeAddress(address);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
     }
 }

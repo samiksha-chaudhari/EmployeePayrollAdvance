@@ -177,3 +177,54 @@ BEGIN
 		SET @user = NULL;
 	END
 END
+
+--SP to store employee details
+create procedure sp_AddEmpAddress
+(  
+	@EmployeeId int,
+	@Address varchar(100),
+	@City varchar(50),
+	@State varchar(50)
+)   
+as 
+begin    
+    Insert into Address (EmployeeId,Address,City,State)    
+	Values (@EmployeeId,@Address, @City,@State)    
+end
+
+select * from Address
+
+--SP to get specific employee address
+CREATE PROC spGetSpecificEmpAddress
+	@EmployeeId int
+AS
+BEGIN 
+	SELECT * FROM [Address]
+	WHERE EmployeeId = @EmployeeId
+END
+
+--SP to update employee address details
+CREATE PROC spUpdateEmployeeAddress
+    @EmployeeId int,
+	@Address varchar(100),
+	@City varchar(50),
+	@State varchar(50),
+	@count INT = NULL OUTPUT
+AS
+BEGIN
+	IF EXISTS(SELECT * FROM [Address] WHERE EmployeeId = @EmployeeId )
+	BEGIN
+		SET @count = @EmployeeId
+		UPDATE [Address]
+		SET
+			Address = CASE WHEN @Address='' THEN Address ELSE @Address END,
+			City = CASE WHEN @City='' THEN City ELSE @City END, 
+			State= CASE WHEN @State='' THEN State ELSE @State END
+			WHERE
+			EmployeeId = @EmployeeId;
+	END
+	ELSE
+	BEGIN
+		SET @count =NULL;
+	END
+END
