@@ -24,14 +24,28 @@ namespace EmpRepository.Repository
             {
                 using (sqlConnection)
                 {
-                    SqlCommand sqlCommand = new SqlCommand("sp_AddEmpSalary", sqlConnection);
+                    SqlCommand sqlCommand = new SqlCommand("spGetPresentday", sqlConnection);
                     sqlCommand.CommandType = System.Data.CommandType.StoredProcedure;
                     sqlConnection.Open();
                     sqlCommand.Parameters.AddWithValue("@EmployeeId", salary.EmployeeId);
-                    sqlCommand.Parameters.AddWithValue("@SalaryDate", salary.SalaryDate);
-                    sqlCommand.Parameters.AddWithValue("@Amount", salary.Amount);
-                    sqlCommand.Parameters.AddWithValue("@PaySlip", salary.PaySlip);
-                    int result = sqlCommand.ExecuteNonQuery();
+                    AttendanceModel attend = new AttendanceModel();
+                    SqlDataReader read = sqlCommand.ExecuteReader();
+                    if (read.Read())
+                    {
+                        attend.PresentDay = Convert.ToInt32(read["PresentDay"]);                       
+                        attend.DailySalary = Convert.ToInt32(read["DailySalary"]);
+                    }
+                    sqlConnection.Close();
+                    float amount = attend.PresentDay * attend.DailySalary;
+
+                    SqlCommand sqlCommand1 = new SqlCommand("sp_AddEmpSalary", sqlConnection);
+                    sqlCommand1.CommandType = System.Data.CommandType.StoredProcedure;
+                    sqlConnection.Open();
+                    sqlCommand1.Parameters.AddWithValue("@EmployeeId", salary.EmployeeId);
+                    sqlCommand1.Parameters.AddWithValue("@SalaryDate", salary.SalaryDate);
+                    sqlCommand1.Parameters.AddWithValue("@Amount", amount);
+                    sqlCommand1.Parameters.AddWithValue("@PaySlip", salary.PaySlip);
+                    int result = sqlCommand1.ExecuteNonQuery();
                     if (result > 0)
                         return true;
                     else

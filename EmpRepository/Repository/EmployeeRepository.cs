@@ -61,31 +61,72 @@ namespace EmpRepository.Repository
             }
         }
 
+        public string Login(LoginModel login)
+        {
+            sqlConnection = new SqlConnection(this.Configuration.GetConnectionString("EmployeeDB"));
+            try
+            {
+                using (sqlConnection)
+                {
+                    SqlCommand sqlCommand = new SqlCommand("login", sqlConnection);
+                    sqlCommand.CommandType = System.Data.CommandType.StoredProcedure;
+
+                    sqlCommand.Parameters.AddWithValue("@Email", login.Email);
+                    sqlCommand.Parameters.AddWithValue("@Password", login.Password);
+                    sqlConnection.Open();
+                    EmployeeModel register = new EmployeeModel();
+                    SqlDataReader sqlData = sqlCommand.ExecuteReader();
+                    if (sqlData.Read())
+                    {
+                        register.EmployeeId = Convert.ToInt32(sqlData["EmployeeId"]);
+                        register.UserName = sqlData["UserName"].ToString();
+                        register.Email = sqlData["Email"].ToString();
+                        register.MobileNo = sqlData["MobileNo"].ToString();
+                        ConnectionMultiplexer connectionMultiplexer = ConnectionMultiplexer.Connect("127.0.0.1:6379");
+                        IDatabase database = connectionMultiplexer.GetDatabase();
+                        database.StringSet(key: "Name", register.EmployeeId);
+                        database.StringSet(key: "User Id", register.UserName.ToString());
+                        database.StringSet(key: "Number", register.MobileNo.ToString());
+                        return "Login Successful";
+                    }
+                    else
+                    {
+                        return "Login Unsuccessful";
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
+            }
+            finally
+            {
+                sqlConnection.Close();
+            }
+        }
+
+
         //public string Login(LoginModel login)
         //{
         //    sqlConnection = new SqlConnection(this.Configuration.GetConnectionString("EmployeeDB"));
-
         //    try
         //    {
         //        using (sqlConnection)
         //        {
-        //            SqlCommand sqlCommand = new SqlCommand("spUserLogin", sqlConnection);
+        //            SqlCommand sqlCommand = new SqlCommand("spEmployeeLogin", sqlConnection);
         //            // login.Password = EncryptPassword(login.Password);
         //            sqlCommand.CommandType = System.Data.CommandType.StoredProcedure;
         //            sqlConnection.Open();
-
         //            sqlCommand.Parameters.AddWithValue("@Email", login.Email);
         //            sqlCommand.Parameters.AddWithValue("@Password", login.Password);
-        //            sqlCommand.Parameters.AddWithValue("@EmployeeId", login.EmployeeId);
         //            sqlCommand.Parameters.Add("@user", SqlDbType.Int).Direction = ParameterDirection.Output;
-
         //            sqlCommand.ExecuteNonQuery();
         //            var result = sqlCommand.Parameters["@user"].Value;
         //            if (!(result is DBNull))
         //            {
         //                if (Convert.ToInt32(result) == 2)
         //                {
-        //                    GetEmployee(login.EmployeeId);
+        //                    GetEmployeeByEmail(login.Email);
         //                    return "Login is Successfull";
         //                }
         //                return "Incorrect email or password";
@@ -102,44 +143,6 @@ namespace EmpRepository.Repository
         //        sqlConnection.Close();
         //    }
         //}
-
-        public string Login(LoginModel login)
-        {
-            sqlConnection = new SqlConnection(this.Configuration.GetConnectionString("EmployeeDB"));
-            try
-            {
-                using (sqlConnection)
-                {
-                    SqlCommand sqlCommand = new SqlCommand("spEmployeeLogin", sqlConnection);
-                    // login.Password = EncryptPassword(login.Password);
-                    sqlCommand.CommandType = System.Data.CommandType.StoredProcedure;
-                    sqlConnection.Open();
-                    sqlCommand.Parameters.AddWithValue("@Email", login.Email);
-                    sqlCommand.Parameters.AddWithValue("@Password", login.Password);
-                    sqlCommand.Parameters.Add("@user", SqlDbType.Int).Direction = ParameterDirection.Output;
-                    sqlCommand.ExecuteNonQuery();
-                    var result = sqlCommand.Parameters["@user"].Value;
-                    if (!(result is DBNull))
-                    {
-                        if (Convert.ToInt32(result) == 2)
-                        {
-                            GetEmployeeByEmail(login.Email);
-                            return "Login is Successfull";
-                        }
-                        return "Incorrect email or password";
-                    }
-                    return "Login failed";
-                }
-            }
-            catch (Exception e)
-            {
-                throw new Exception(e.Message);
-            }
-            finally
-            {
-                sqlConnection.Close();
-            }
-        }
 
         public string EncryptPassword(string password)
         {
@@ -310,26 +313,53 @@ namespace EmpRepository.Repository
                 }
         }
 
-        public string GenerateToken(string userName)
+        public bool Attendance(AttendanceModel attend)
         {
+            sqlConnection = new SqlConnection(this.Configuration.GetConnectionString("EmployeeDB"));
             try
             {
-                var key = Encoding.UTF8.GetBytes(this.Configuration["SecretKey"]);
-                SymmetricSecurityKey securityKey = new SymmetricSecurityKey(key);
-                SecurityTokenDescriptor descriptor = new SecurityTokenDescriptor
+                using (sqlConnection)
                 {
-                    Subject = new ClaimsIdentity(new[] { new Claim(ClaimTypes.Name, userName) }),
-                    Expires = DateTime.UtcNow.AddMinutes(3000000),
-                    SigningCredentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256Signature)
-                };
-                JwtSecurityTokenHandler handler = new JwtSecurityTokenHandler();
-                JwtSecurityToken token = handler.CreateJwtSecurityToken(descriptor);
-                return handler.WriteToken(token);
+                    SqlCommand sqlCommand = new SqlCommand("sp_EmpAttendance", sqlConnection);
+                    sqlCommand.CommandType = System.Data.CommandType.StoredProcedure;
+                    sqlConnection.Open();
+                    sqlCommand.Parameters.AddWithValue("@EmployeeId", attend.EmployeeId);
+                    sqlCommand.Parameters.AddWithValue("@PresentDay", attend.PresentDay);
+                    sqlCommand.Parameters.AddWithValue("@AbsentDay", attend.AbsentDay);
+                    sqlCommand.Parameters.AddWithValue("@DailySalary", attend.DailySalary);
+                    int result = sqlCommand.ExecuteNonQuery();
+                    if (result > 0)
+                        return true;
+                    else
+                        return false;
+                }
             }
-            catch (ArgumentNullException ex)
+            catch (Exception e)
             {
-                throw new ArgumentNullException(ex.Message);
+                throw new Exception(e.Message);
             }
+            finally
+            {
+                sqlConnection.Close();
+            }
+        }
+
+        public string GenerateToken(string email)
+        {
+            byte[] key = Encoding.UTF8.GetBytes(this.Configuration["SecretKey"]);
+            SymmetricSecurityKey securityKey = new SymmetricSecurityKey(key); ////create new instance
+            SecurityTokenDescriptor descriptor = new SecurityTokenDescriptor ////placeholders to store all atrribute to generate token
+            {
+                Subject = new ClaimsIdentity(new[]
+                {
+                new Claim(ClaimTypes.Name, email)
+            }),
+                Expires = DateTime.UtcNow.AddMinutes(30),
+                SigningCredentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256Signature)
+            };
+            JwtSecurityTokenHandler handler = new JwtSecurityTokenHandler();
+            JwtSecurityToken token = handler.CreateJwtSecurityToken(descriptor);
+            return handler.WriteToken(token);
         }
 
     }

@@ -14,6 +14,17 @@ startDate date,
 Note varchar(50) NOT NULL
 );
 
+create table Attendance(
+AttendanceId int identity(1,1) primary key,
+EmployeeId int not null,
+PresentDay int,
+AbsentDay int,
+DailySalary float
+);
+
+alter table [Attendance] add constraint Attendance_EmployeeId_FK
+foreign key (EmployeeId) references [Employee](EmployeeId)
+
 create table Salary(
 SalaryId int identity(1,1) primary key,
 EmployeeId int not null,
@@ -178,6 +189,16 @@ BEGIN
 	END
 END
 
+-- Employee Login
+create procedure login (    
+    @Email VARCHAR(50),
+	@Password VARCHAR(50)
+)   
+as   
+Begin   
+    select * from Employee WHERE Email = @Email and Password = @Password
+End
+
 --SP to store employee details
 create procedure sp_AddEmpAddress
 (  
@@ -280,3 +301,103 @@ BEGIN
 		SET @count =NULL;
 	END
 END
+
+--***************************************************************************
+--SP FOR PAYOUT
+CREATE PROC spGetSalaryAmt
+	@SalaryId int
+AS
+BEGIN 
+	SELECT Amount FROM [Salary]
+	WHERE SalaryId = @SalaryId
+END
+
+--SP to store employee Payout details
+create procedure sp_AddEmpPayout
+(  
+	@SalaryId int,
+	@CTC float,
+	@PF float,
+	@TAX float
+)   
+as 
+begin    
+    Insert into Payout(SalaryId,CTC,PF,TAX)    
+	Values (@SalaryId,@CTC, @PF,@TAX)    
+end
+
+select * from Salary
+
+--SP to get specific employee  Payout
+CREATE PROC spGetSpecificEmpPayoutDetail
+	@SalaryId int
+AS
+BEGIN 
+	SELECT * FROM [Payout]
+	WHERE SalaryId = @SalaryId
+END
+
+--SP to update employee Salary details
+CREATE PROC spUpdateEmployeePayout
+    @SalaryId int,
+	@CTC float,
+	@PF float,
+	@TAX float,
+	@count INT = NULL OUTPUT
+AS
+BEGIN
+	IF EXISTS(SELECT * FROM [Salary] WHERE SalaryId = @SalaryId )
+	BEGIN
+		SET @count = @SalaryId
+		UPDATE [Payout]
+		SET
+			SalaryId = CASE WHEN @SalaryId='' THEN SalaryId ELSE @SalaryId END,
+			CTC = CASE WHEN @CTC='' THEN CTC ELSE @CTC END, 
+			PF = CASE WHEN @PF='' THEN PF ELSE @PF END,
+			TAX = CASE WHEN @TAX='' THEN TAX ELSE @TAX END
+			WHERE
+			SalaryId = @SalaryId;
+	END
+	ELSE
+	BEGIN
+		SET @count =NULL;
+	END
+END
+
+
+	select * from Payout
+
+--	AttendanceId int identity(1,1) primary key,
+--EmployeeId int not null,
+--PresentDay int,
+--AbsentDay int,
+--DailySalary float
+
+---------------------------------------------------------
+--SP to take attendence
+
+create procedure sp_EmpAttendance
+(  
+	@EmployeeId int,
+	@PresentDay int,
+	@AbsentDay int,
+	@DailySalary float
+)   
+as 
+begin    
+    Insert into Attendance(EmployeeId,PresentDay,AbsentDay,DailySalary)    
+	Values (@EmployeeId,@PresentDay, @AbsentDay,@DailySalary)    
+end
+
+select PresentDay,DailySalary from Attendance where EmployeeId = 1
+
+--SP FOR geting present day
+CREATE PROC spGetPresentday
+	@EmployeeId int
+AS
+BEGIN 
+	SELECT PresentDay,DailySalary FROM [Attendance]
+	WHERE EmployeeId = @EmployeeId
+END
+
+select * from Salary

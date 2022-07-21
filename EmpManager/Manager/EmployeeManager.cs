@@ -84,11 +84,22 @@ namespace EmpManager.Manager
                 throw new Exception(ex.Message);
             }
         }
-        public string GenerateToken(string userName)
+        public string GenerateToken(string email)
         {
             try
             {
-                return this.repository.GenerateToken(userName);
+                return this.repository.GenerateToken(email);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+        public bool Attendance(AttendanceModel attend)
+        {
+            try
+            {
+                return this.repository.Attendance(attend);
             }
             catch (Exception ex)
             {

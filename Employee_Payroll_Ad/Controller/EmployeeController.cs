@@ -46,36 +46,33 @@ namespace Employee_Payroll_Ad.Controller
         [Route("api/login")]
         public IActionResult Login([FromBody] LoginModel login)
         {
-            try
+            try 
             {
-
-                string result = this.manager.Login(login);
-                if (result.Equals("Login is Successfull"))
+                var result = this.manager.Login(login);
+                if (result.Equals("Login Successful"))
                 {
                     ConnectionMultiplexer connectionMultiplexer = ConnectionMultiplexer.Connect("127.0.0.1:6379");
                     IDatabase database = connectionMultiplexer.GetDatabase();
-
-                    Dictionary<string, string> data = new Dictionary<string, string>();
-                    data.Add("EmployeeId", database.StringGet("EmployeeId"));
-                    data.Add("UserName", database.StringGet("UserName"));
-                    data.Add("MobileNo", database.StringGet("MobileNo"));
-                    data.Add("Email", login.Email);
-                    data.Add("accessToken", this.manager.GenerateToken(login.Email));
-                    return this.Ok(new { Status = true, Message = result, result = data });
-                }
-                else if (result.Equals("Invalid Password"))
-                {
-                    return this.BadRequest(new ResponseModel<string>() { Status = false, Message = result });
+                    string UserName = database.StringGet("UserName");
+                    int EmployeeId = Convert.ToInt32(database.StringGet("EmployeeId"));
+                    string MobileNo = database.StringGet("MobileNo");
+                    EmployeeModel data = new EmployeeModel
+                    {
+                        UserName = UserName,
+                        Email = login.Email,
+                        EmployeeId = EmployeeId,
+                        MobileNo = MobileNo
+                    };
+                    string token = this.manager.GenerateToken(login.Email);
+                    return this.Ok(new { Status = true, Message = result, Data = data, Token = token });
                 }
                 else
                 {
-
                     return this.BadRequest(new ResponseModel<string>() { Status = false, Message = result });
                 }
             }
             catch (Exception ex)
             {
-
                 return this.NotFound(new ResponseModel<string>() { Status = false, Message = ex.Message });
             }
         }
@@ -159,6 +156,28 @@ namespace Employee_Payroll_Ad.Controller
                 else
                 {
                     return this.BadRequest(new ResponseModel<string>() { Status = false, Message = "Failed to updated Details" });
+                }
+            }
+            catch (Exception ex)
+            {
+                return this.NotFound(new ResponseModel<string>() { Status = false, Message = ex.Message });
+            }
+        }
+
+        [HttpPost]
+        [Route("api/Attendance")]
+        public IActionResult Attendance([FromBody] AttendanceModel attend)
+        {
+            try
+            {
+                var result = this.manager.Attendance(attend);
+                if (result)
+                {
+                    return this.Ok(new ResponseModel<string>() { Status = true, Message = "Added Employee Attendance Successfully !" });
+                }
+                else
+                {
+                    return this.BadRequest(new ResponseModel<string>() { Status = false, Message = "Failed to add new Employee, Try again" });
                 }
             }
             catch (Exception ex)

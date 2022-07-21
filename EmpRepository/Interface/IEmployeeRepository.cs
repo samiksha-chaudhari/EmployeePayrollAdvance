@@ -11,7 +11,8 @@ namespace EmpRepository.Interface
         EmployeeModel GetEmployeeByEmail(string Email);
         bool UpdateEmployeeDetails(EmployeeModel employeemodel);
         string Login(LoginModel login);
-        string GenerateToken(string userName);
+        string GenerateToken(string email);
+        bool Attendance(AttendanceModel attend);
 
     }
 }
