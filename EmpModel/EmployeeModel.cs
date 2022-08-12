@@ -16,5 +16,7 @@ namespace EmpModel
         public string Department { get; set; }
         public DateTime StartDate { get; set; }
         public string Note { get; set; }
+        public string serviceType { get; } = "Employee";
+        public string Token { get; set; }
     }
 }

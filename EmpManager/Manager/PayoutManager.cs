@@ -26,6 +26,17 @@ namespace EmpManager.Manager
                 throw new Exception(ex.Message);
             }
         }
+        public List<PayoutModel> GetAllPayout()
+        {
+            try
+            {
+                return this.repository.GetAllPayout();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
         public PayoutModel GetEmployeePayoutDetails(int SalaryId)
         {
             try

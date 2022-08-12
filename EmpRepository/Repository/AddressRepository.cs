@@ -48,6 +48,46 @@ namespace EmpRepository.Repository
             }
         }
 
+        public List<AddressModel> GetAllAddress()
+        {
+            sqlConnection = new SqlConnection(this.Configuration.GetConnectionString("EmployeeDB"));
+            using (sqlConnection)
+                try
+                {
+                    SqlCommand sqlCommand = new SqlCommand("spGetAllEmpAdd", sqlConnection);
+                    sqlCommand.CommandType = System.Data.CommandType.StoredProcedure;
+                    sqlConnection.Open();
+                    SqlDataReader reader = sqlCommand.ExecuteReader();
+                    if (reader.HasRows)
+                    {
+                        List<AddressModel> AddressList = new List<AddressModel>();
+                        while (reader.Read())
+                        {
+                            AddressModel Data = new AddressModel();
+                            Data.EmployeeId = Convert.ToInt32(reader["EmployeeId"]);
+                            Data.Address = reader["Address"].ToString();
+                            Data.State = reader["State"].ToString();
+                            Data.City = reader["City"].ToString();
+
+                            AddressList.Add(Data);
+                        }
+                        return AddressList;
+                    }
+                    else
+                    {
+                        return null;
+                    }
+                }
+                catch (Exception e)
+                {
+                    throw new Exception(e.Message);
+                }
+                finally
+                {
+                    sqlConnection.Close();
+                }
+        }
+
         public AddressModel GetEmployeeAddress(int employeeId)
         {
             sqlConnection = new SqlConnection(this.Configuration.GetConnectionString("EmployeeDB"));

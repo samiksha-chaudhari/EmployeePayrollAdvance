@@ -14,6 +14,19 @@ startDate date,
 Note varchar(50) NOT NULL
 );
 
+create table Admin(
+AdminId int identity(1,1) primary key,
+AdminName varchar(50) NOT NULL,
+Email varchar(50) NOT NULL,
+Password varchar(50) NOT NULL,
+MobileNo varchar(12) NOT NULL
+);
+
+Insert into Admin (AdminName,Email,Password,MobileNo)    
+	Values ('Samiksha','Samiksha@gmail.com','samiksha','1234567890'); 
+
+select * from Admin;
+
 create table Attendance(
 AttendanceId int identity(1,1) primary key,
 EmployeeId int not null,
@@ -78,12 +91,42 @@ begin
 end
 
 select * from Employee
+ALTER TABLE Employee
+ALTER COLUMN Gender varchar(50);
 
 --SP to get all employee details
 CREATE PROC spGetAllEmp
 AS
 BEGIN 
 	SELECT * FROM Employee
+END
+
+--SP to get all employee address
+CREATE PROC spGetAllEmpAdd
+AS
+BEGIN 
+	SELECT * FROM Address
+END
+
+--SP to get all employee salary
+CREATE PROC spGetAllEmpSalary
+AS
+BEGIN 
+	SELECT * FROM Salary
+END
+
+--SP to get all employee PAyroll
+CREATE PROC spGetAllEmpPay
+AS
+BEGIN 
+	SELECT * FROM Payout
+END
+
+--SP to get all employee attendance
+CREATE PROC spGetAllEmpAttend
+AS
+BEGIN 
+	SELECT * FROM Attendance
 END
 
 --SP to get specific employee detail
@@ -199,6 +242,16 @@ Begin
     select * from Employee WHERE Email = @Email and Password = @Password
 End
 
+
+-- Admin Login
+create procedure AdminLogin (    
+    @Email VARCHAR(50),
+	@Password VARCHAR(50)
+)   
+as   
+Begin   
+    select * from Admin WHERE Email = @Email and Password = @Password
+End
 --SP to store employee details
 create procedure sp_AddEmpAddress
 (  

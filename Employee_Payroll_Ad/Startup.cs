@@ -39,6 +39,7 @@ namespace Employee_Payroll_Ad
             services.AddTransient<ISalaryManager, SalaryManager>();
             services.AddTransient<IPayoutRepository, PayoutRepository>();
             services.AddTransient<IPayoutManager, PayoutManager>();
+            services.AddControllers().AddNewtonsoftJson();
 
             services.AddSession();
             services.AddCors(options => options.AddPolicy("AllowAllHeaders", builder =>
@@ -74,11 +75,10 @@ namespace Employee_Payroll_Ad
                                 }
                           },
                             new string[] {}
-
                     }
                 });
             });
-
+            
             services.AddAuthentication(option =>
             {
                 option.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;

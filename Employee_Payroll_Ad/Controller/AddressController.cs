@@ -42,6 +42,28 @@ namespace Employee_Payroll_Ad.Controller
         }
 
         [HttpGet]
+        [Route("api/GetAllAddress")]
+        public IActionResult GetAllAddress()
+        {
+            var result = this.manager.GetAllAddress();
+            try
+            {
+                if (result.Count > 0)
+                {
+                    return this.Ok(new { Status = true, Message = "All Employeee Address Details", data = result });
+                }
+                else
+                {
+                    return this.BadRequest(new ResponseModel<string>() { Status = false, Message = "Try again" });
+                }
+            }
+            catch (Exception e)
+            {
+                return this.NotFound(new ResponseModel<string>() { Status = false, Message = e.Message });
+            }
+        }
+
+        [HttpGet]
         [Route("api/GetEmployeeAddress")]
         public IActionResult GetEmployeeAddress(int employeeId)
         {

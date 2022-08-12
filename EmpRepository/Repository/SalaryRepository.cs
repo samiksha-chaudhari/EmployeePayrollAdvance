@@ -62,6 +62,46 @@ namespace EmpRepository.Repository
             }
         }
 
+        public List<SalaryModel> GetAllSalary()
+        {
+            sqlConnection = new SqlConnection(this.Configuration.GetConnectionString("EmployeeDB"));
+            using (sqlConnection)
+                try
+                {
+                    SqlCommand sqlCommand = new SqlCommand("spGetAllEmpSalary", sqlConnection);
+                    sqlCommand.CommandType = System.Data.CommandType.StoredProcedure;
+                    sqlConnection.Open();
+                    SqlDataReader reader = sqlCommand.ExecuteReader();
+                    if (reader.HasRows)
+                    {
+                        List<SalaryModel> salaryList = new List<SalaryModel>();
+                        while (reader.Read())
+                        {
+                            SalaryModel Data = new SalaryModel();
+                            Data.EmployeeId = Convert.ToInt32(reader["EmployeeId"]);
+                            Data.Amount = Convert.ToInt32(reader["Amount"]);
+                            Data.PaySlip = Convert.ToDateTime(reader["PaySlip"]);
+                            Data.SalaryDate = Convert.ToDateTime(reader["SalaryDate"]);
+
+                            salaryList.Add(Data);
+                        }
+                        return salaryList;
+                    }
+                    else
+                    {
+                        return null;
+                    }
+                }
+                catch (Exception e)
+                {
+                    throw new Exception(e.Message);
+                }
+                finally
+                {
+                    sqlConnection.Close();
+                }
+        }
+
         public SalaryModel GetEmployeeSalaryDetails(int employeeId)
         {
             sqlConnection = new SqlConnection(this.Configuration.GetConnectionString("EmployeeDB"));

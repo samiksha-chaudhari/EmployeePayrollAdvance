@@ -26,6 +26,17 @@ namespace EmpManager.Manager
                 throw new Exception(ex.Message);
             }
         }
+        public List<SalaryModel> GetAllSalary()
+        {
+            try
+            {
+                return this.repository.GetAllSalary();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
         public SalaryModel GetEmployeeSalaryDetails(int employeeId)
         {
             try

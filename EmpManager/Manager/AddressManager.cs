@@ -26,6 +26,17 @@ namespace EmpManager.Manager
                 throw new Exception(ex.Message);
             }
         }
+        public List<AddressModel> GetAllAddress()
+        {
+            try
+            {
+                return this.repository.GetAllAddress();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
         public AddressModel GetEmployeeAddress(int employeeId)
         {
             try

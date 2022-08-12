@@ -51,6 +51,17 @@ namespace EmpManager.Manager
             }
         }
 
+        public List<AttendanceModel> GetAllEmployeeAttend()
+        {
+            try
+            {
+                return this.repository.GetAllEmployeeAttend();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
         public EmployeeModel GetEmployee(int employeeId)
         {
             try
@@ -84,11 +95,11 @@ namespace EmpManager.Manager
                 throw new Exception(ex.Message);
             }
         }
-        public string GenerateToken(string email)
+        public string GenerateToken(EmployeeModel emp)
         {
             try
             {
-                return this.repository.GenerateToken(email);
+                return this.repository.GenerateToken(emp);
             }
             catch (Exception ex)
             {
@@ -100,6 +111,30 @@ namespace EmpManager.Manager
             try
             {
                 return this.repository.Attendance(attend);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        public string LoginAdmin(LoginModel login)
+        {
+            try
+            {
+                return this.repository.LoginAdmin(login);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        public string GenerateTokenAdmin(AdminModel admin)
+        {
+            try
+            {
+                return this.repository.GenerateTokenAdmin(admin);
             }
             catch (Exception ex)
             {

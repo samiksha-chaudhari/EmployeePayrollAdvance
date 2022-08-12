@@ -42,6 +42,29 @@ namespace Employee_Payroll_Ad.Controller
         }
 
         [HttpGet]
+        [Route("api/GetAllPayout")]
+        public IActionResult GetAllPayout()
+        {
+            var result = this.manager.GetAllPayout();
+            try
+            {
+                if (result.Count > 0)
+                {
+                    return this.Ok(new { Status = true, Message = "All Employeee Payout Details", data = result });
+                }
+                else
+                {
+                    return this.BadRequest(new ResponseModel<string>() { Status = false, Message = "Try again" });
+                }
+            }
+            catch (Exception e)
+            {
+                return this.NotFound(new ResponseModel<string>() { Status = false, Message = e.Message });
+            }
+        }
+
+
+        [HttpGet]
         [Route("api/GetEmployeePayoutDetails")]
         public IActionResult GetEmployeePayoutDetails(int SalaryId)
         {

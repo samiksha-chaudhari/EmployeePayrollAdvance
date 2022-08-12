@@ -42,6 +42,28 @@ namespace Employee_Payroll_Ad.Controller
         }
 
         [HttpGet]
+        [Route("api/GetAllSalary")]
+        public IActionResult GetAllSalary()
+        {
+            var result = this.manager.GetAllSalary();
+            try
+            {
+                if (result.Count > 0)
+                {
+                    return this.Ok(new { Status = true, Message = "All Employeee Salary Details", data = result });
+                }
+                else
+                {
+                    return this.BadRequest(new ResponseModel<string>() { Status = false, Message = "Try again" });
+                }
+            }
+            catch (Exception e)
+            {
+                return this.NotFound(new ResponseModel<string>() { Status = false, Message = e.Message });
+            }
+        }
+
+        [HttpGet]
         [Route("api/GetEmployeeSalaryDetails")]
         public IActionResult GetEmployeeSalaryDetails(int employeeId)
         {

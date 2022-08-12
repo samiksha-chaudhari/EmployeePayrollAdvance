@@ -61,7 +61,47 @@ namespace EmpRepository.Repository
             {
                 sqlConnection.Close();
             }
-        }             
+        }
+
+        public List<PayoutModel> GetAllPayout()
+        {
+            sqlConnection = new SqlConnection(this.Configuration.GetConnectionString("EmployeeDB"));
+            using (sqlConnection)
+                try
+                {
+                    SqlCommand sqlCommand = new SqlCommand("spGetAllEmpPay", sqlConnection);
+                    sqlCommand.CommandType = System.Data.CommandType.StoredProcedure;
+                    sqlConnection.Open();
+                    SqlDataReader read = sqlCommand.ExecuteReader();
+                    if (read.HasRows)
+                    {
+                        List<PayoutModel> PayoutList = new List<PayoutModel>();
+                        while (read.Read())
+                        {
+                            PayoutModel pay = new PayoutModel();
+                            pay.SalaryId = Convert.ToInt32(read["SalaryId"]);
+                            pay.CTC = (float)Convert.ToDouble(read["CTC"]);
+                            pay.PF = (float)Convert.ToDouble(read["PF"]);
+                            pay.TAX = (float)Convert.ToDouble(read["TAX"]);
+
+                            PayoutList.Add(pay);
+                        }
+                        return PayoutList;
+                    }
+                    else
+                    {
+                        return null;
+                    }
+                }
+                catch (Exception e)
+                {
+                    throw new Exception(e.Message);
+                }
+                finally
+                {
+                    sqlConnection.Close();
+                }
+        }
 
         public PayoutModel GetEmployeePayoutDetails(int SalaryId)
         {

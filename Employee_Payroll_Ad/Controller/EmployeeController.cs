@@ -42,8 +42,9 @@ namespace Employee_Payroll_Ad.Controller
             }
         }
 
+        [Authorize(Roles = Role.Employee)]
         [HttpPost]
-        [Route("api/login")]
+        [Route("api/Employeelogin")]
         public IActionResult Login([FromBody] LoginModel login)
         {
             try 
@@ -63,7 +64,43 @@ namespace Employee_Payroll_Ad.Controller
                         EmployeeId = EmployeeId,
                         MobileNo = MobileNo
                     };
-                    string token = this.manager.GenerateToken(login.Email);
+                    string token = this.manager.GenerateToken(data);
+                    return this.Ok(new { Status = true, Message = result, Data = data, Token = token });
+                }
+                else
+                {
+                    return this.BadRequest(new ResponseModel<string>() { Status = false, Message = result });
+                }
+            }
+            catch (Exception ex)
+            {
+                return this.NotFound(new ResponseModel<string>() { Status = false, Message = ex.Message });
+            }
+        }
+
+        [Authorize (Roles=Role.Admin)]
+        [HttpPost]
+        [Route("api/Adminlogin")]
+        public IActionResult LoginAdmin([FromBody] LoginModel login)
+        {
+            try
+            {
+                var result = this.manager.LoginAdmin(login);
+                if (result.Equals("Login Successful"))
+                {
+                    ConnectionMultiplexer connectionMultiplexer = ConnectionMultiplexer.Connect("127.0.0.1:6379");
+                    IDatabase database = connectionMultiplexer.GetDatabase();
+                    string AdminName = database.StringGet("AdminName");
+                    int AdminId = Convert.ToInt32(database.StringGet("AdminId"));
+                    string MobileNo = database.StringGet("MobileNo");
+                    AdminModel data = new AdminModel
+                    {
+                        AdminName = AdminName,
+                        Email = login.Email,
+                        AdminId = AdminId,
+                        MobileNo = MobileNo
+                    };
+                    string token = this.manager.GenerateTokenAdmin(data);
                     return this.Ok(new { Status = true, Message = result, Data = data, Token = token });
                 }
                 else
@@ -183,6 +220,28 @@ namespace Employee_Payroll_Ad.Controller
             catch (Exception ex)
             {
                 return this.NotFound(new ResponseModel<string>() { Status = false, Message = ex.Message });
+            }
+        }
+
+        [HttpGet]
+        [Route("api/GetAllEmployeeAttend")]
+        public IActionResult GetAllEmployeeAttend()
+        {
+            var result = this.manager.GetAllEmployeeAttend();
+            try
+            {
+                if (result.Count > 0)
+                {
+                    return this.Ok(new { Status = true, Message = "All Employeee Details", data = result });
+                }
+                else
+                {
+                    return this.BadRequest(new ResponseModel<string>() { Status = false, Message = "Try again" });
+                }
+            }
+            catch (Exception e)
+            {
+                return this.NotFound(new ResponseModel<string>() { Status = false, Message = e.Message });
             }
         }
     }
